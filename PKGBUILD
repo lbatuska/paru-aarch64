@@ -15,13 +15,21 @@ sha256sums=('b9c67f1390caacc949c2eb2a254e8cf37778f382c3c6b8d057fa6feb6eaeb0f9')
 
 prepare() {
   cd "$pkgname-$pkgver"
+
+  # Modify the Cargo.toml to replace the alpm version and add features
+  sed -i 's/alpm = "4.0.2"/alpm = { version = "4.0.1", features = ["generate"] }/' Cargo.toml
+
+  cargo update
+
+  cargo clean
+
   cargo fetch --locked --target "$(rustc -vV | sed -n 's|host: ||p')"
 }
 
-build () {
+build() {
   cd "$srcdir/$pkgname-$pkgver"
 
-  if pacman -T pacman-git > /dev/null; then
+  if pacman -T pacman-git >/dev/null; then
     _features+="git,"
   fi
 
